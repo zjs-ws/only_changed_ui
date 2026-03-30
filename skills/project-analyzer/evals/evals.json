@@ -1,0 +1,23 @@
+{
+  "skill_name": "project-analyzer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我快速了解这个项目",
+      "expected_output": "项目概览总结 + PROJECT_ANALYSIS.md 文档",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "分析项目架构和技术栈",
+      "expected_output": "架构分析和技术栈详细信息",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "生成项目文档，说明这个项目用了什么技术和配置",
+      "expected_output": "技术栈和配置的详细文档",
+      "files": []
+    }
+  ]
+}
