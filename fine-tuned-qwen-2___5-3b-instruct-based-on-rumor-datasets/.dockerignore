@@ -1,0 +1,10 @@
+.mdl
+.msc
+.mv
+Modelfile
+README.md
+configuration.json
+__pycache__
+*.pyc
+.git
+.cursor

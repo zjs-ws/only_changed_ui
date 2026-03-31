@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  # GPU deployment (default)
+  rumor-detector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rumor-detector
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=/app/model
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  # CPU deployment — activate with: docker compose --profile cpu up -d rumor-detector-cpu
+  rumor-detector-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rumor-detector-cpu
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=/app/model
+    profiles:
+      - cpu
+    restart: unless-stopped

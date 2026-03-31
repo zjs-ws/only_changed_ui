@@ -54,3 +54,13 @@ web/
 # Deployment artifacts
 backend/Dockerfile.langgraph
 config.yaml.bak
+
+# 忽略所有模型权重和检查点
+*.safetensors
+*.bin
+*.pth
+*.pt
+*.ckpt
+*.gguf
+# 也可以直接忽略那个特定的庞大子文件夹（只传外层代码）
+fine-tuned-qwen-2___5-3b-instruct-based-on-rumor-datasets/fine-tuned-qwen-2___5-3b-instruct-based-on-rumor-datasets/
