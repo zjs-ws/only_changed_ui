@@ -1,98 +1,97 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { GlobeIcon, MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { isLocale } from "@/core/i18n";
-import { cn } from "@/lib/utils";
-import { env } from "@/env";
+import { Button } from "@/components/ui/button";
+import { isLocale, type Locale } from "@/core/i18n";
 import { useI18n } from "@/core/i18n/hooks";
+import { cn } from "@/lib/utils";
+
+const THEME_CYCLE: ("system" | "light" | "dark")[] = [
+  "system",
+  "light",
+  "dark",
+];
+
+const LOCALE_CYCLE: Locale[] = ["zh-CN", "en-US"];
 
 export function SidebarStatus({ className }: { className?: string }) {
   const { t, locale, changeLocale } = useI18n();
   const { theme, setTheme } = useTheme();
-  const [online, setOnline] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const update = () => setOnline(navigator.onLine);
-    update();
-    window.addEventListener("online", update);
-    window.addEventListener("offline", update);
-    return () => {
-      window.removeEventListener("online", update);
-      window.removeEventListener("offline", update);
-    };
   }, []);
 
-  const themeValue = useMemo(
-    () => (mounted ? (theme ?? "system") : "system"),
-    [mounted, theme],
-  );
+  const currentTheme = (theme ?? "system") as "system" | "light" | "dark";
+
+  const themeLabel = useMemo(() => {
+    if (!mounted) return "";
+    if (currentTheme === "system") return t.settings.appearance.system;
+    if (currentTheme === "light") return t.settings.appearance.light;
+    return t.settings.appearance.dark;
+  }, [mounted, currentTheme, t]);
+
+  const ThemeIcon = useMemo(() => {
+    if (!mounted) return MonitorIcon;
+    if (currentTheme === "system") return MonitorIcon;
+    if (currentTheme === "light") return SunIcon;
+    return MoonIcon;
+  }, [mounted, currentTheme]);
+
+  const cycleTheme = useCallback(() => {
+    const idx = THEME_CYCLE.indexOf(currentTheme);
+    const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length]!;
+    setTheme(next);
+  }, [currentTheme, setTheme]);
+
+  const cycleLocale = useCallback(() => {
+    const idx = LOCALE_CYCLE.indexOf(locale as Locale);
+    const next = LOCALE_CYCLE[(idx + 1) % LOCALE_CYCLE.length]!;
+    if (isLocale(next)) {
+      changeLocale(next);
+    }
+  }, [locale, changeLocale]);
+
+  const localeLabel = useMemo(() => {
+    return locale === "zh-CN" ? "中文" : "English";
+  }, [locale]);
 
   return (
     <div className={cn("flex flex-col gap-2 px-1", className)}>
       <div className="flex items-center justify-between gap-2 text-xs">
-        <span className="text-muted-foreground">{t.sidebar.connection}</span>
-        <Badge variant={online ? "secondary" : "destructive"}>
-          {online ? t.sidebar.online : t.sidebar.offline}
-        </Badge>
-      </div>
-      <div className="flex items-center justify-between gap-2 text-xs">
         <span className="text-muted-foreground">{t.sidebar.theme}</span>
-        <Select
-          value={themeValue}
-          onValueChange={(value) =>
-            setTheme(value as "system" | "light" | "dark")
-          }
-        >
-          <SelectTrigger className="h-7 w-[120px] text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="system">{t.settings.appearance.system}</SelectItem>
-            <SelectItem value="light">{t.settings.appearance.light}</SelectItem>
-            <SelectItem value="dark">{t.settings.appearance.dark}</SelectItem>
-          </SelectContent>
-        </Select>
+        {mounted ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 gap-1.5 px-2 text-xs font-medium"
+            onClick={cycleTheme}
+          >
+            <ThemeIcon className="size-3" />
+            {themeLabel}
+          </Button>
+        ) : (
+          <span className="text-xs font-medium">—</span>
+        )}
       </div>
+
       <div className="flex items-center justify-between gap-2 text-xs">
         <span className="text-muted-foreground">
           {t.settings.appearance.languageTitle}
         </span>
-        <Select
-          value={locale}
-          onValueChange={(value) => {
-            if (isLocale(value)) {
-              changeLocale(value);
-            }
-          }}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 gap-1.5 px-2 text-xs font-medium"
+          onClick={cycleLocale}
         >
-          <SelectTrigger className="h-7 w-[120px] text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="zh-CN">中文</SelectItem>
-            <SelectItem value="en-US">English</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="flex items-center justify-between gap-2 text-xs">
-        <span className="text-muted-foreground">{t.sidebar.mode}</span>
-        <span className="truncate font-medium">
-          {env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY === "true"
-            ? t.sidebar.demo
-            : t.sidebar.live}
-        </span>
+          <GlobeIcon className="size-3" />
+          {localeLabel}
+        </Button>
       </div>
     </div>
   );

@@ -308,11 +308,7 @@ export const enUS: Translations = {
     actions: "Actions",
     keyboardShortcuts: "Keyboard Shortcuts",
     keyboardShortcutsDescription:
-<<<<<<< HEAD
-      "Navigate DeerFlow faster with keyboard shortcuts.",
-=======
       "Navigate the app faster with keyboard shortcuts.",
->>>>>>> 99ab8e3 (new)
     openCommandPalette: "Open Command Palette",
     toggleSidebar: "Toggle Sidebar",
   },

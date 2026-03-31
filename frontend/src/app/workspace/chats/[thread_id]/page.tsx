@@ -138,12 +138,8 @@ export default function ChatPage() {
                     isNewThread && <Welcome mode={settings.context.mode} />
                   }
                   disabled={
-<<<<<<< HEAD
                     env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY === "true" ||
                     isUploading
-=======
-                    env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY === "true" || isUploading
->>>>>>> 99ab8e3 (new)
                   }
                   onContextChange={(context) => setSettings("context", context)}
                   onSubmit={handleSubmit}

@@ -1,7 +1,8 @@
 import { ChevronUpIcon, ListTodoIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { Todo } from "@/core/todos";
+import { useI18n } from "@/core/i18n/hooks";
 import { cn } from "@/lib/utils";
 
 import {
@@ -24,9 +25,15 @@ export function TodoList({
   hidden?: boolean;
   onToggle?: () => void;
 }) {
+  const { locale } = useI18n();
   const [internalCollapsed, setInternalCollapsed] = useState(true);
   const isControlled = controlledCollapsed !== undefined;
   const collapsed = isControlled ? controlledCollapsed : internalCollapsed;
+
+  const completedCount = useMemo(
+    () => todos.filter((t) => t.status === "completed").length,
+    [todos],
+  );
 
   const handleToggle = () => {
     if (isControlled) {
@@ -35,6 +42,8 @@ export function TodoList({
       setInternalCollapsed((prev) => !prev);
     }
   };
+
+  const isZh = locale === "zh-CN";
 
   return (
     <div
@@ -46,22 +55,29 @@ export function TodoList({
     >
       <header
         className={cn(
-          "bg-accent flex min-h-8 shrink-0 cursor-pointer items-center justify-between px-4 py-1 text-sm transition-all duration-300 ease-out",
+          "bg-accent group flex min-h-9 shrink-0 cursor-pointer items-center justify-between gap-3 px-4 text-sm transition-all duration-300 ease-out",
         )}
         onClick={handleToggle}
       >
-        <div className="text-muted-foreground flex flex-col">
-          <div className="flex items-center gap-2">
-            <ListTodoIcon className="size-4" />
-            <div>To-dos</div>
-          </div>
-          {collapsed && (
-            <div className="text-muted-foreground/80 pl-6 text-[11px]">
-              点击可向上展开查看 To-do 列表
-            </div>
-          )}
+        <div className="text-muted-foreground flex items-center gap-2">
+          <ListTodoIcon className="size-4 shrink-0" />
+          <span className="font-medium">
+            To-dos
+            <span className="text-muted-foreground/60 ml-1.5 text-xs font-normal">
+              {completedCount}/{todos.length}
+            </span>
+          </span>
         </div>
-        <div>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground/50 text-xs opacity-0 transition-opacity group-hover:opacity-100">
+            {collapsed
+              ? isZh
+                ? "点击展开"
+                : "Click to expand"
+              : isZh
+                ? "点击收起"
+                : "Click to collapse"}
+          </span>
           <ChevronUpIcon
             className={cn(
               "text-muted-foreground size-4 transition-transform duration-300 ease-out",
